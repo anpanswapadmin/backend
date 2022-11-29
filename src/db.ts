@@ -3,22 +3,18 @@ import ShortUniqueId from 'short-unique-id';
 import { User } from './models';
 
 const sequelize = new Sequelize({
-	database: "de48ouogeq5e78",
-	username: "pluouxxniejwmf",
-	password: "67fe02329bed118ce0517e5525a74ae5c5a88cabaff66f7103a9ae2d97ebe251",
-	host: "ec2-54-155-129-189.eu-west-1.compute.amazonaws.com",
-	port: 5432,
-	dialect: "postgres",
+	database: "qfwyzfqo_anpanswap",
+	username: "qfwyzfqo_anpan",
+	password: "bsd&2YqQ]8%b",
+	host: "localhost",
+	port: 3306,
+	dialect: "mysql",
 	dialectOptions: {
-	  ssl: {
-		require: true, // This will help you. But you will see nwe error
-		rejectUnauthorized: false // This line will fix new error
-	  }
 	},
   });
 
 //Instantiate
-const uid = new ShortUniqueId({ length: 12 });
+const uid = new ShortUniqueId({ length: 16 });
 
 // Init all models
 User.init(
@@ -34,11 +30,17 @@ User.init(
 			unique: true,
 			validate: { isLowercase: true },
 		},
-		username: {
+		referralcode: {
 			allowNull: false,
 			type: STRING,
 			unique: true,
 			defaultValue: (): string => uid(),
+		},
+		referrer: {
+			type: STRING,
+		},
+		referralno: {
+			type: INTEGER,
 		},
 	},
 	{
