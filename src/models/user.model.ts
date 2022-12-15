@@ -7,4 +7,5 @@ export class User extends Model {
 	public referralcode!: string; // for nullable fields
 	public referrer?: string;
 	public referralno?: number;
+	public authcheck?: string;
 }

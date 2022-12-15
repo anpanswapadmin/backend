@@ -14,7 +14,7 @@ const sequelize = new Sequelize({
   });
 
 //Instantiate
-const uid = new ShortUniqueId({ length: 16 });
+const uid = new ShortUniqueId({ length: 20 });
 
 // Init all models
 User.init(
@@ -22,7 +22,7 @@ User.init(
 		nonce: {
 			allowNull: false,
 			type: INTEGER.UNSIGNED, // SQLITE will use INTEGER
-			defaultValue: (): number => Math.floor(Math.random() * 10000), // Initialize with a random nonce
+			defaultValue: (): number => Math.floor(Math.random() * 1000000000), // Initialize with a random nonce
 		},
 		account: {
 			allowNull: false,
@@ -41,6 +41,9 @@ User.init(
 		},
 		referralno: {
 			type: INTEGER,
+		},
+		authcheck: {
+			type: STRING,
 		},
 	},
 	{

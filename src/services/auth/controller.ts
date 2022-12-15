@@ -3,7 +3,22 @@ import { bufferToHex } from 'ethereumjs-util';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../../config';
-import { User } from '../../models/user.model';
+import { User} from '../../models/user.model';
+
+export const find = (req: Request, res: Response, next: NextFunction) => {
+
+	// If a query string ?account=... is given, then filter results
+	const whereClause =
+		req.query && req.query.account && req.query.authcheck
+			? {
+					where: { account: req.query.account, authcheck: req.query.authcheck },
+			  }
+			: undefined;
+
+	return User.findAll(whereClause)
+		.then((user: User[]) => res.json(user))
+		.catch(next);
+};
 
 export const create = (req: Request, res: Response, next: NextFunction) => {
 	const { signature, account } = req.body;
@@ -38,9 +53,8 @@ export const create = (req: Request, res: Response, next: NextFunction) => {
 						'User is not defined in "Verify digital signature".'
 					);
 				}
-
-				const msg = `I am signing my one-time nonce: ${user.nonce}`;
-
+				
+				const msg = `action=register&address=${account}&registerReferrerCode=${user.referrer}&ts=${user.nonce}`;
 				// We now are in possession of msg, account and signature. We
 				// will use a helper from eth-sig-util to extract the address from the signature
 				const msgBufferHex = bufferToHex(Buffer.from(msg, 'utf8'));
@@ -72,22 +86,20 @@ export const create = (req: Request, res: Response, next: NextFunction) => {
 						'User is not defined in "Generate a new nonce for the user".'
 					);
 				}
+
 				const referralcode = req.session.cookie.path;
 
-
-					User.findOne({ where: { referralcode } })
-					.then(user=>{
-						if(user){
-							const newNo = (Number(user.referralno) + 1)
-							user.referralno = newNo
-							user.save();
-
-						}
+				User.findOne({ where: { referralcode } })
+				.then(user=>{
+					if(user){
+						const newNo = (Number(user.referralno) + 1)
+						user.referralno = newNo
+						user.save();
+					}
 				})
 
-			user.nonce = Math.floor(Math.random() * 10000);
-			user.referrer = referralcode;
-			return user.save();
+				user.authcheck = "yes";
+				return user.save();
 			})
 			////////////////////////////////////////////////////
 			// Step 4: Create JWT
